@@ -22,7 +22,7 @@ const Home = () => {
         {/* Sidebar with NavLinks */}
         <div className="bg-gray-300 shadow-lg w-1/6">
           <NavLink
-            to="overview"
+            to=""
             className={({ isActive }) =>
               `flex justify-evenly items-center m-4 text-center p-2 rounded-md shadow-lg hover:bg-green-100 ${
                 isActive ? 'bg-green-200 border-l-4 border-green-500' : 'bg-white'
@@ -109,7 +109,7 @@ const Home = () => {
         
         <div className="mx-4 bg-gray-300 shadow-lg w-full">
           <Routes>
-            <Route path="overview" element={<Overview/>} />
+            <Route path="" element={<Overview/>} />
             <Route path="products" element={<Products />} />
             <Route path="users" element={<Users />} />
             <Route path="sales" element={<Sales />} />
