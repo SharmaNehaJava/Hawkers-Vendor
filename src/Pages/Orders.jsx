@@ -16,7 +16,7 @@ const orderStats = {
 
 const OrdersPage = () => {
 	return (
-		<div className='flex-1 relative z-10 overflow-auto  bg-gray-900'>
+		<div className='flex-1 relative z-10 overflow-auto  bg-gray-100'>
 			<Header title={"Orders"} />
 
 			<main className='max-w-7xl mx-auto py-6 px-4 lg:px-8'>
@@ -37,10 +37,10 @@ const OrdersPage = () => {
 					<StatCard name='Total Revenue' icon={DollarSign} value={orderStats.totalRevenue} color='#EF4444' />
 				</motion.div>
 
-				<div className='grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8'>
+				{/* <div className='grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8'>
 					<DailyOrders />
 					<OrderDistribution />
-				</div>
+				</div> */}
 
 				<OrdersTable />
 			</main>

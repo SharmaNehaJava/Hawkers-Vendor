@@ -17,36 +17,36 @@ const Home = () => {
   return (
     <div className="flex h-full lg:h-screen overflow-hidden">
       {/* Sidebar */}
-      <div className={`bg-gray-950 bg-opacity-95 shadow-lg ${isCollapsed ? 'w-16' : 'w-full lg:w-1/6'} h-auto lg:h-full lg:overflow-y-auto transition-all duration-300`}>
+      <div className={`bg-gray-200 bg-opacity-95  ${isCollapsed ? 'w-16' : 'w-full lg:w-1/6'} h-auto lg:h-full lg:overflow-y-auto transition-all duration-300`}>
         {/* Toggle Button */}
         <button
-          className="flex items-center justify-center mb-4 p-2 w-full h-12 text-white transition-all duration-300 hover:bg-green-600 hover:scale-105"
+          className="flex items-center justify-center mb-4 p-2 w-full h-12 text-gray-950 transition-all duration-300 hover:bg-green-600 hover:scale-105"
           onClick={() => setIsCollapsed(!isCollapsed)}
         >
           <AiOutlineMenu size={24} />
         </button>
 
         {/* NavLinks */}
-        <NavLink
+        {/* <NavLink
           to=""
           className={({ isActive }) =>
            `flex items-center ${
               isCollapsed ? 'justify-center' : 'justify-evenly'
-            } m-4 p-2 rounded-md bg-gradient-to-r from-green-500 to-green-100  hover:bg-green-600 hover:scale-110 ${
+            } m-4 p-2 rounded-md bg-gradient-to-r from-green-500 to-green-400  hover:bg-green-600 hover:scale-110 ${
               isActive ? 'scale-110 ' : 'bg-white'
             }`
           }
         >
           <IoIosAdd />
           {!isCollapsed && <h3 className="mx-2">Overview</h3>}
-        </NavLink>
+        </NavLink> */}
 
         <NavLink
           to="products"
           className={({ isActive }) =>
             `flex items-center ${
               isCollapsed ? 'justify-center' : 'justify-evenly'
-            } m-4 p-2 rounded-md bg-gradient-to-r from-green-500 to-green-100  hover:bg-green-600 hover:scale-110 ${
+            } m-4 p-2 rounded-md bg-gradient-to-r from-green-500 to-green-400  hover:bg-green-600 hover:scale-110 ${
               isActive ? 'scale-110 ' : 'bg-white'
             }`
           }
@@ -55,41 +55,41 @@ const Home = () => {
           {!isCollapsed && <h3 className="mx-2">Products</h3>}
         </NavLink>
 
-        <NavLink
+        {/* <NavLink
           to="users"
           className={({ isActive }) =>
             `flex items-center ${
               isCollapsed ? 'justify-center' : 'justify-evenly'
-            } m-4 p-2 rounded-md bg-gradient-to-r from-green-500 to-green-100  hover:bg-green-600 hover:scale-110 ${
+            } m-4 p-2 rounded-md bg-gradient-to-r from-green-500 to-green-400  hover:bg-green-600 hover:scale-110 ${
               isActive ? 'scale-110 ' : 'bg-white'
             }`
           }
         >
           <AiOutlineFileDone />
           {!isCollapsed && <h3 className="mx-2">Users</h3>}
-        </NavLink>
+        </NavLink> */}
 
         {/* Additional NavLinks */}
-        <NavLink
+        {/* <NavLink
           to="sales"
           className={({ isActive }) =>
             `flex items-center ${
               isCollapsed ? 'justify-center' : 'justify-evenly'
-            } m-4 p-2 rounded-md bg-gradient-to-r from-green-500 to-green-100  hover:bg-green-600 hover:scale-110 ${
+            } m-4 p-2 rounded-md bg-gradient-to-r from-green-500 to-green-400  hover:bg-green-600 hover:scale-110 ${
               isActive ? 'scale-110 ' : 'bg-white'
             }`
           }
         >
           <AiOutlineFileDone />
           {!isCollapsed && <h3 className="mx-2">Sales</h3>}
-        </NavLink>
+        </NavLink> */}
 
         <NavLink
           to="orders"
           className={({ isActive }) =>
             `flex items-center ${
               isCollapsed ? 'justify-center' : 'justify-evenly'
-            } m-4 p-2 rounded-md bg-gradient-to-r from-green-500 to-green-100  hover:bg-green-600 hover:scale-110 ${
+            } m-4 p-2 rounded-md bg-gradient-to-r from-green-500 to-green-400  hover:bg-green-600 hover:scale-110 ${
               isActive ? 'scale-110 ' : 'bg-white'
             }`
           }
@@ -98,26 +98,26 @@ const Home = () => {
           {!isCollapsed && <h3 className="mx-2">Orders</h3>}
         </NavLink>
 
-        <NavLink
+        {/* <NavLink
           to="analytics"
           className={({ isActive }) =>
             `flex items-center ${
               isCollapsed ? 'justify-center' : 'justify-evenly'
-            } m-4 p-2 rounded-md bg-gradient-to-r from-green-500 to-green-100  hover:bg-green-600 hover:scale-110 ${
+            } m-4 p-2 rounded-md bg-gradient-to-r from-green-500 to-green-400  hover:bg-green-600 hover:scale-110 ${
               isActive ? 'scale-110 ' : 'bg-white'
             }`
           }
         >
           <AiOutlineFileDone />
           {!isCollapsed && <h3 className="mx-2">Analytics</h3>}
-        </NavLink>
+        </NavLink> */}
 
         <NavLink
           to="settings"
           className={({ isActive }) =>
             `flex items-center ${
               isCollapsed ? 'justify-center' : 'justify-evenly'
-            } m-4 p-2 rounded-md bg-gradient-to-r from-green-500 to-green-100  hover:bg-green-600 hover:scale-110 ${
+            } m-4 p-2 rounded-md bg-gradient-to-r from-green-500 to-green-400  hover:bg-green-600 hover:scale-110 ${
               isActive ? 'scale-110 ' : 'bg-white'
             }`
           }
@@ -130,12 +130,12 @@ const Home = () => {
       {/* Main Content */}
       <div className={`flex-grow w-full lg:w-5/6 overflow-y-auto transition-all duration-300 ${isCollapsed ? 'lg:w-full' : 'lg:w-5/6'}`}>
         <Routes>
-          <Route path="" element={<Overview />} />
+          {/* <Route path="" element={<Overview />} /> */}
           <Route path="products" element={<Products />} />
-          <Route path="users" element={<Users />} />
-          <Route path="sales" element={<Sales />} />
+          {/* <Route path="users" element={<Users />} /> */}
+          {/* <Route path="sales" element={<Sales />} /> */}
           <Route path="orders" element={<Orders />} />
-          <Route path="analytics" element={<Analytics />} />
+          {/* <Route path="analytics" element={<Analytics />} /> */}
           <Route path="settings" element={<Settings />} />
         </Routes>
       </div>
