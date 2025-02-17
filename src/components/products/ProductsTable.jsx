@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Edit, Search, Trash2, Plus } from "lucide-react";
-import axios from "../../api/apiInstances";
+import { Edit, Search, Trash2 } from "lucide-react";
+import instance from '../../api/apiInstances.js';
 
 const ProductsTable = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -13,18 +13,21 @@ const ProductsTable = () => {
     category: "",
     price: "",
     stock: "",
+    measurement: "",
     description: "",
     image: null,
   });
+  const [isLoading, setIsLoading] = useState(false);
+  const [showSuccessPopup, setShowSuccessPopup] = useState(false);
 
-  const categories = ['Fruits', 'Vegetables', 'Fast Food', 'Dairy', 'Other', 'Juices'];  // Add more categories as needed
+  const categories = ['Fruits', 'Vegetables', 'Fast Food', 'Dairy', 'Other', 'Juices'];
+  const measurements = ['Kg', 'L', 'per piece', 'gm', 'ml', 'Dozen', 'Other'];
 
-  // Fetch products from the backend
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await axios.get("/api/vendors/products");
-        setProducts(response.data.products); // Assuming backend returns { products: [...] }
+        const response = await instance.get("/api/vendors/products");
+        setProducts(response.data);
       } catch (error) {
         console.error("Error fetching products:", error.response?.data?.message || error.message);
       }
@@ -32,11 +35,8 @@ const ProductsTable = () => {
     fetchProducts();
   }, []);
 
-
   const handleSearch = (e) => {
-    axios.get(`/products?search=${searchTerm}`)
-      .then(response => setProducts(response.data.products))
-      .catch(error => console.log(error));
+    setSearchTerm(e.target.value.toLowerCase());
   };
 
   const filteredProducts = products.filter(
@@ -45,58 +45,55 @@ const ProductsTable = () => {
       product.category.toLowerCase().includes(searchTerm)
   );
 
-  // Add a new product
   const handleAddProduct = async (e) => {
     e.preventDefault();
-    const formData = new FormData();
-    Object.keys(newProduct).forEach((key) => {
-      formData.append(key, newProduct[key]);
-    });
+    setIsLoading(true);
 
     try {
-      const response = await axios.post("http://localhost:3000/api/vendors/add-product", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
+      const { data } = await instance.post("/api/vendors/get-signed-url", {
+        filename: newProduct.image.name,
+        filetype: newProduct.image.type,
+        category: newProduct.category,
       });
+
+      const { url, key } = data;
+
+      await fetch(url, {
+        method: 'PUT',
+        body: newProduct.image,
+        headers: {
+          'Content-Type': newProduct.image.type,
+        },
+      });
+
+      const response = await instance.post("/api/vendors/add-product", {
+        ...newProduct,
+        imageUrl: key,
+      });
+
       setProducts([...products, response.data.product]);
-      setNewProduct({ name: "", category: "", price: "", stock: "", description: "", image: null });
+      setNewProduct({ name: "", category: "", price: "", stock: "", measurement: "", description: "", image: null });
+      setShowSuccessPopup(true);
+      setTimeout(() => setShowSuccessPopup(false), 3000); // Hide popup after 3 seconds
     } catch (error) {
       console.error("Error adding product:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  // Update an existing product
-  const handleUpdateProduct = async (e) => {
-    e.preventDefault();
-    const formData = new FormData();
-    formData.append("productId", editingProduct._id);
-    Object.keys(editingProduct).forEach((key) => {
-      if (key !== "_id") {
-        formData.append(key, editingProduct[key]);
-      }
-    });
-
-    try {
-      const response = await axios.put("/products/update", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
-      const updatedProducts = products.map((product) =>
-        product._id === response.data.product._id ? response.data.product : product
-      );
-      setProducts(updatedProducts);
-      setIsEditing(false);
-      setEditingProduct(null);
-    } catch (error) {
-      console.error("Error updating product:", error);
-    }
-  };
-
-  // Delete a product
-  const handleDeleteProduct = async (productId) => {
-    try {
-      await axios.delete("/products/remove", { data: { productId } });
-      setProducts(products.filter((product) => product._id !== productId));
-    } catch (error) {
-      console.error("Error deleting product:", error);
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    if (isEditing) {
+      setEditingProduct((prevProduct) => ({
+        ...prevProduct,
+        [name]: value,
+      }));
+    } else {
+      setNewProduct((prevProduct) => ({
+        ...prevProduct,
+        [name]: value,
+      }));
     }
   };
 
@@ -137,23 +134,17 @@ const ProductsTable = () => {
         <input
           className="p-2 hover:bg-green-300 rounded-md"
           type="text"
-          placeholder="Name"
+          placeholder="Product Name"
+          name="name"
           value={isEditing ? editingProduct.name : newProduct.name}
-          onChange={(e) =>
-            isEditing
-              ? setEditingProduct({ ...editingProduct, name: e.target.value })
-              : setNewProduct({ ...newProduct, name: e.target.value })
-          }
+          onChange={handleInputChange}
           required
         />
         <select
           className="p-2 hover:bg-green-300 rounded-md"
+          name="category"
           value={isEditing ? editingProduct.category : newProduct.category}
-          onChange={(e) =>
-            isEditing
-              ? setEditingProduct({ ...editingProduct, category: e.target.value })
-              : setNewProduct({ ...newProduct, category: e.target.value })
-          }
+          onChange={handleInputChange}
           required
         >
           <option value="">Select Category</option>
@@ -165,36 +156,39 @@ const ProductsTable = () => {
           className="p-2 hover:bg-green-300 rounded-md"
           type="number"
           placeholder="Price"
+          name="price"
           value={isEditing ? editingProduct.price : newProduct.price}
-          onChange={(e) =>
-            isEditing
-              ? setEditingProduct({ ...editingProduct, price: e.target.value })
-              : setNewProduct({ ...newProduct, price: e.target.value })
-          }
+          onChange={handleInputChange}
           required
         />
         <input
           className="p-2 rounded-md hover:bg-green-300"
           type="number"
           placeholder="Stock"
+          name="stock"
           value={isEditing ? editingProduct.stock : newProduct.stock}
-          onChange={(e) =>
-            isEditing
-              ? setEditingProduct({ ...editingProduct, stock: e.target.value })
-              : setNewProduct({ ...newProduct, stock: e.target.value })
-          }
+          onChange={handleInputChange}
           required
         />
+        <select
+          className="p-2 hover:bg-green-300 rounded-md"
+          name="measurement"
+          value={isEditing ? editingProduct.measurement : newProduct.measurement}
+          onChange={handleInputChange}
+          required
+        >
+          <option value="">Select Measurement</option>
+          {measurements.map((measurement) => (
+            <option key={measurement} value={measurement}>{measurement}</option>
+          ))}
+        </select>
         <input
           className="p-2 rounded-md hover:bg-green-300"
           type="text"
           placeholder="Description"
+          name="description"
           value={isEditing ? editingProduct.description : newProduct.description}
-          onChange={(e) =>
-            isEditing
-              ? setEditingProduct({ ...editingProduct, description: e.target.value })
-              : setNewProduct({ ...newProduct, description: e.target.value })
-          }
+          onChange={handleInputChange}
         />
         <input type="file" className="p-1 hover:bg-green-300 rounded-md" onChange={handleFileChange} />
         <button type="submit" className="bg-indigo-500 text-white py-2 rounded-md">
@@ -202,7 +196,12 @@ const ProductsTable = () => {
         </button>
       </form>
 
-      {/* Display Product List */}
+      {showSuccessPopup && (
+        <div className="fixed top-4 right-4 bg-green-500 text-white p-4 rounded-md shadow-lg">
+          Product added successfully!
+        </div>
+      )}
+
       <div className="overflow-x-auto mt-6">
         <table className="min-w-full divide-y divide-gray-700">
           <thead>

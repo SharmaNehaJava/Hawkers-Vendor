@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const instance = axios.create({
-  baseURL: 'http://localhost:3000', 
+  baseURL: 'http://localhost:5000', 
   headers: {
     'Content-Type': 'application/json',
   },
@@ -9,11 +9,16 @@ const instance = axios.create({
 
 instance.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+    const vendorInfo = localStorage.getItem('vendorInfo');
+    if (vendorInfo) {
+      const { token } = JSON.parse(vendorInfo);
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+      } else {
+        console.error('Token is missing. Please log in.');
+      }
     } else {
-      console.error('Token is missing. Please log in.');
+      console.error('Vendor info is missing. Please log in.');
     }
     return config;
   },

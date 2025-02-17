@@ -1,12 +1,14 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { AuthContext } from '../Context/AuthContext.jsx';
 import instance from '../api/apiInstances';
 
-const VendorSignIn = () => {
+const SignIn = () => {
   const [identifier, setIdentifier] = useState('');
   const [otp, setOtp] = useState('');
   const [step, setStep] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
+  const { login, isLoggedIn } = useContext(AuthContext);
   const navigate = useNavigate();
 
   // Only check for valid phone number format
@@ -14,30 +16,36 @@ const VendorSignIn = () => {
 
   // Check if vendor is already logged in when the component mounts
   useEffect(() => {
-    const vendorInfo = JSON.parse(localStorage.getItem('vendorInfo'));
-    if (vendorInfo) {
-      navigate('/vendor-dashboard'); // Redirect to vendor dashboard
+    console.log("SignIn isLoggedIn:", isLoggedIn);
+    if (isLoggedIn) {
+      // If user info exists in localStorage, consider them logged in
+      navigate('/'); // Redirect to home page or dashboard
     }
-  }, [navigate]);
+  }, [navigate, isLoggedIn]);
 
   const handleSendOtp = useCallback(async () => {
     setIsLoading(true);
     try {
-      if (!isPhoneNumber(identifier)) {
-        alert('Please enter a valid phone number.');
+      const method = isPhoneNumber(identifier)
+        ? 'sms' : '';
+
+      if (!method) {
+        alert('Please enter a valid phone number or email address.');
         setIsLoading(false);
         return;
       }
+      // console.log("Method "+ method);
 
       const response = await instance.post('/api/vendors/request-otp', {
         identifier,
         method: 'sms', // We are now using only phone numbers
         actionType: 'signin', // Specify action type as 'signin'
       });
+      // console.log(response);
 
       if (!response.data.vendorExists) {
         alert('Vendor account not found. Please create an account first.');
-        navigate('/vendor-signup'); // Redirect to sign-up page
+        navigate('/signup'); // Redirect to sign-up page
         return;
       }
 
@@ -53,18 +61,28 @@ const VendorSignIn = () => {
   const handleVerifyOtp = useCallback(async () => {
     setIsLoading(true);
     try {
+      // console.log("Identifier "+ identifier);
       const { data } = await instance.post('/api/vendors/verify-otp', {
         identifier,
         otp,
+        actionType: 'signin',
+        method: 'sms',
       });
+      
       if (data.verified) {
-        // Store token and vendor info in localStorage for persistent login
+        
+        // console.log("token "+data.token);
+
+        const vendorInfo = { mobile: identifier, token: data.token , _id: data.vendor._id, vendor: data.vendor };
+        // console.log("vendorInfo", vendorInfo);
         localStorage.setItem(
           'vendorInfo',
-          JSON.stringify({ phone: identifier, token: data.token }) // Store phone number and token
+          JSON.stringify(vendorInfo) // Assuming backend sends a token
         );
+        // console.log("strignify vendorInfo", JSON.stringify(vendorInfo));
         alert('OTP verified. You are now logged in.');
-        navigate('/vendor-dashboard'); // Redirect to vendor dashboard
+        login();
+        navigate('/'); // Redirect after login
       } else {
         alert('Invalid OTP. Please try again.');
       }
@@ -74,10 +92,10 @@ const VendorSignIn = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [identifier, otp, navigate]);
+  }, [identifier, otp, navigate, login]);
 
   return (
-    <div className="inset-0 h-screen flex items-center justify-center bg-gray-400 bg-opacity-50 z-50">
+    <div className="inset-0 h-screen w-full flex items-center justify-center bg-gray-400 bg-opacity-50 z-50">
       <div className="h-1/2 relative bg-white rounded-lg shadow-lg w-full max-w-md p-8">
         <button
           className="w-6 bg-red-500 rounded-full absolute top-2 right-2 text-white hover:text-gray-900"
@@ -115,7 +133,7 @@ const VendorSignIn = () => {
             <div className="text-center">
               <p className="text-xs text-gray-500">
                 Don't have a vendor account?{' '}
-                <span onClick={() => navigate('/vendor-signup')} className="text-blue-700 cursor-pointer">
+                <span onClick={() => navigate('/signup')} className="text-blue-700 cursor-pointer">
                   Create Account
                 </span>
               </p>
@@ -153,4 +171,4 @@ const VendorSignIn = () => {
   );
 };
 
-export default React.memo(VendorSignIn);
+export default React.memo(SignIn);
