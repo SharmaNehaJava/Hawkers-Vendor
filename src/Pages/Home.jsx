@@ -8,8 +8,16 @@ import { AiOutlineFileDone, AiOutlineMenu } from 'react-icons/ai';
 
 const Home = () => {
   const socket = useSocket();
-  const { vendorInfo } = useContext(AuthContext);
   const [isCollapsed, setIsCollapsed] = useState(window.innerWidth < 1024);
+  const { isLoggedIn, vendorInfo } = useContext(AuthContext);
+
+  useEffect(() => {
+    if (socket && isLoggedIn) {
+      socket.emit('vendorOnline', {
+        vendorId: vendorInfo._id,
+      });
+    }
+  }, [socket, vendorInfo]);
 
   useEffect(() => {
     if (!navigator.geolocation) {
@@ -17,13 +25,14 @@ const Home = () => {
       return;
     }
 
-    if (socket && vendorInfo) {
+    if (socket && isLoggedIn) {
       const watchId = navigator.geolocation.watchPosition(
         (position) => {
           const { latitude, longitude } = position.coords;
           socket.emit('updateVendorLocation', {
             vendorId: vendorInfo._id,
             coordinates: [longitude, latitude],
+            token: vendorInfo.token,
           });
         },
         (error) => {
@@ -69,10 +78,10 @@ const Home = () => {
   return (
     <div className="flex h-full lg:h-screen overflow-hidden">
       {/* Sidebar */}
-      <div className={`bg-gray-200 bg-opacity-95 ${isCollapsed ? 'w-16' : 'w-64'} h-full transition-all duration-300`}>
+      <div className={`bg-green-800 bg-gradient-to-b from-green-200 to-green-500 ${isCollapsed ? 'w-16' : 'w-64'} h-full transition-all duration-300`}> 
         {/* Toggle Button */}
         <button
-          className="flex items-center justify-center mb-4 p-2 w-full h-12 text-gray-950 transition-all duration-300 hover:bg-green-600 hover:scale-105"
+          className="flex items-center justify-center mb-4 p-2 w-full h-12 text-white transition-all duration-300 hover:bg-green-600 hover:scale-105"
           onClick={() => setIsCollapsed(!isCollapsed)}
         >
           <AiOutlineMenu size={24} />
@@ -82,7 +91,7 @@ const Home = () => {
         <NavLink
           to="products"
           className={({ isActive }) =>
-            `flex items-center ${isCollapsed ? 'justify-center' : 'justify-start'} m-4 p-2 rounded-md transition-all duration-300 ${isActive ? 'bg-green-600 text-white' : 'bg-white text-gray-700'} hover:bg-green-600 hover:text-white`
+            `flex items-center ${isCollapsed ? 'justify-center' : 'justify-start'} m-4 p-2 rounded-md transition-all duration-300 ${isActive ? 'bg-white text-green-500' : 'bg-green-500 text-white'} hover:bg-white hover:text-green-500`
           }
         >
           <FaListAlt />
@@ -92,7 +101,7 @@ const Home = () => {
         <NavLink
           to="orders"
           className={({ isActive }) =>
-            `flex items-center ${isCollapsed ? 'justify-center' : 'justify-start'} m-4 p-2 rounded-md transition-all duration-300 ${isActive ? 'bg-green-600 text-white' : 'bg-white text-gray-700'} hover:bg-green-600 hover:text-white`
+            `flex items-center ${isCollapsed ? 'justify-center' : 'justify-start'} m-4 p-2 rounded-md transition-all duration-300 ${isActive ? 'bg-white text-green-500' : 'bg-green-500 text-white'} hover:bg-white hover:text-green-500`
           }
         >
           <AiOutlineFileDone />
@@ -102,7 +111,7 @@ const Home = () => {
         <NavLink
           to="settings"
           className={({ isActive }) =>
-            `flex items-center ${isCollapsed ? 'justify-center' : 'justify-start'} m-4 p-2 rounded-md transition-all duration-300 ${isActive ? 'bg-green-600 text-white' : 'bg-white text-gray-700'} hover:bg-green-600 hover:text-white`
+            `flex items-center ${isCollapsed ? 'justify-center' : 'justify-start'} m-4 p-2 rounded-md transition-all duration-300 ${isActive ? 'bg-white text-green-500' : 'bg-green-500 text-white'} hover:bg-white hover:text-green-500`
           }
         >
           <AiOutlineFileDone />
