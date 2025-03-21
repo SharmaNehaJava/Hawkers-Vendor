@@ -1,22 +1,38 @@
-import { CheckCircle, Clock, DollarSign, ShoppingBag } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
-
+import { ShoppingBag, Clock, CheckCircle, DollarSign } from "lucide-react";
 import Header from "../components/common/Header";
 import StatCard from "../components/common/StatCard";
-import DailyOrders from "../components/orders/DailyOrders";
-import OrderDistribution from "../components/orders/OrderDistribution";
 import OrdersTable from "../components/orders/OrdersTable";
-
-const orderStats = {
-	totalOrders: "1,234",
-	pendingOrders: "56",
-	completedOrders: "1,178",
-	totalRevenue: "$98,765",
-};
+import instance from "../api/apiInstances";
 
 const OrdersPage = () => {
+	const [orderStats, setOrderStats] = useState({
+		totalOrders: 0,
+		pendingOrders: 0,
+		completedOrders: 0,
+		failedOrders: 0,
+		totalRevenue: 0,
+	});
+
+	// Exposing fetchOrders using useRef for external calls
+	const fetchOrders = useRef(async () => {
+		try {
+			const vendorId = localStorage.getItem("vendorInfo._id");
+			const { data } = await instance.get(`/api/vendors/orders-dashboard?vendorId=${vendorId}`);
+			console.log(data);
+			setOrderStats(data);
+		} catch (error) {
+			console.error("Error fetching orders:", error);
+		}
+	});
+
+	useEffect(() => {
+		fetchOrders.current(); // Initial load
+	}, []);
+
 	return (
-		<div className='flex-1 relative z-10 overflow-auto  bg-gray-100'>
+		<div className='flex-1 relative z-10 overflow-auto bg-gray-100'>
 			<Header title={"Orders"} />
 
 			<main className='max-w-7xl mx-auto py-6 px-4 lg:px-8'>
@@ -37,14 +53,10 @@ const OrdersPage = () => {
 					<StatCard name='Total Revenue' icon={DollarSign} value={orderStats.totalRevenue} color='#EF4444' />
 				</motion.div>
 
-				{/* <div className='grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8'>
-					<DailyOrders />
-					<OrderDistribution />
-				</div> */}
-
-				<OrdersTable />
+				<OrdersTable refreshStats={fetchOrders.current} />
 			</main>
 		</div>
 	);
 };
+
 export default OrdersPage;

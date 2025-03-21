@@ -16,7 +16,7 @@ const SignIn = () => {
 
   // Check if vendor is already logged in when the component mounts
   useEffect(() => {
-    console.log("SignIn isLoggedIn:", isLoggedIn);
+    // console.log("SignIn isLoggedIn:", isLoggedIn);
     if (isLoggedIn) {
       // If user info exists in localStorage, consider them logged in
       navigate('/'); // Redirect to home page or dashboard

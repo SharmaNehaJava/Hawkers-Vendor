@@ -77,7 +77,7 @@ const VendorSignUp = () => {
     setIsLoading(true);
     try {
       const response = await instance.post('/api/vendors/register', { name, email, mobile, businessName,businessType, address });
-      console.log("Token: " + response.data.token);
+      // console.log("Token: " + response.data.token);
       // Store token and vendor info in localStorage for persistent login
       const vendorInfo = { mobile, token: response.data.token, _id: response.data.vendor._id };
       localStorage.setItem(

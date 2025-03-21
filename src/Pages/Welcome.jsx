@@ -10,7 +10,7 @@ const Welcome = () => {
       {/* Left Section (Text & Features) */}
       <div className="w-full lg:w-1/2 flex flex-col items-center text-center space-y-6 lg:pr-10">
         <h1 className="text-3xl md:text-5xl font-extrabold tracking-wide">
-          Welcome to <span className="text-yellow-400">Hawkers</span>
+          Welcome to <span className="text-yellow-300">Hawkers</span>
         </h1>
         <p className="text-lg md:text-xl leading-relaxed">
           Empowering local street vendors by bringing their businesses online.
