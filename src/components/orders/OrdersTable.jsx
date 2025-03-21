@@ -27,7 +27,7 @@ const OrdersTable = ({ refreshStats }) => {
         };
         fetchOrders();
         refreshStats(); 
-    }, [setOrders, orders]);
+    }, []);
 
     const handleSearch = (e) => {
         const term = e.target.value.toLowerCase();
@@ -57,13 +57,10 @@ const OrdersTable = ({ refreshStats }) => {
                 order: { vendor: order.vendor },
             });
 
-            setOrders((prevOrders) =>
-                prevOrders.map((order) =>
-                    order._id === orderId
-                        ? { ...order, status: updatedStatus }
-                        : order
-                )
-            );
+            const { data } = await instance.get("/api/vendors/orders");
+            setOrders(data); 
+            setFilteredOrders(data);
+            refreshStats();
             
             setNotification("Order status updated successfully ✅");
             Navigate('/orders');// Refresh the order list

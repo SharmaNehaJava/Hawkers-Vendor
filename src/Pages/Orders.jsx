@@ -1,10 +1,11 @@
 import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
-import { ShoppingBag, Clock, CheckCircle, DollarSign } from "lucide-react";
+import { ShoppingBag, Clock, CheckCircle, DollarSign, XCircle } from "lucide-react";
 import Header from "../components/common/Header";
 import StatCard from "../components/common/StatCard";
 import OrdersTable from "../components/orders/OrdersTable";
 import instance from "../api/apiInstances";
+import { CanceledError } from "axios";
 
 const OrdersPage = () => {
 	const [orderStats, setOrderStats] = useState({
@@ -50,7 +51,7 @@ const OrdersPage = () => {
 						value={orderStats.completedOrders}
 						color='#10B981'
 					/>
-					<StatCard name='Total Revenue' icon={DollarSign} value={orderStats.totalRevenue} color='#EF4444' />
+					<StatCard name='Failed Orders' icon={XCircle} value={orderStats.failedOrders} color='#EF4444' />
 				</motion.div>
 
 				<OrdersTable refreshStats={fetchOrders.current} />
