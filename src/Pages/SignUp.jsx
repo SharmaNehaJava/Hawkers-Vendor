@@ -76,16 +76,15 @@ const VendorSignUp = () => {
     }
     setIsLoading(true);
     try {
-      const response = await instance.post('/api/vendors/register', { name, email, mobile, businessName,businessType, address });
-      // console.log("Token: " + response.data.token);
+      const { data } = await instance.post('/api/vendors/register', { name, email, mobile, businessName,businessType });
       // Store token and vendor info in localStorage for persistent login
-      const vendorInfo = { mobile, token: response.data.token, _id: response.data.vendor._id };
+      const vendorInfo = { mobile, token: data.token, _id: data.vendor._id, vendor: data.vendor };
       localStorage.setItem(
         'vendorInfo',
         JSON.stringify(vendorInfo)
       );
       alert('Account created successfully. You are now logged in.');
-      login(vendorInfo);
+      login();
       navigate('/');
     } catch (error) {
       console.error('Error during sign-up:', error);
@@ -200,7 +199,7 @@ const VendorSignUp = () => {
               required
             />
           </div>
-          <div className="mb-4">
+          {/* <div className="mb-4">
             <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="address">
               Address
             </label>
@@ -213,7 +212,7 @@ const VendorSignUp = () => {
               placeholder="Enter your address"
               required
             />
-          </div>
+          </div> */}
           <div className="mb-4">
             <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="businessType">
               BusinessType

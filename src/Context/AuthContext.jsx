@@ -7,13 +7,15 @@ export const AuthProvider = ({ children }) => {
   const [vendorInfo, setVendorInfo] = useState(null);
 
   useEffect(() => {
-    const parsedVendorInfo = JSON.parse(localStorage.getItem('vendorInfo'));
+    const storedVendorInfo = localStorage.getItem("vendorInfo");
     
-    if (parsedVendorInfo && parsedVendorInfo.token) {
+    if (storedVendorInfo ) {
       try { 
-        // console.log("AuthContext vendorInfo:", parsedVendorInfo);
-          setIsLoggedIn(true);
-          setVendorInfo(parsedVendorInfo);
+        const parsedVendorInfo = JSON.parse(storedVendorInfo);
+      if (parsedVendorInfo?.token) {
+        setIsLoggedIn(true);
+        setVendorInfo(parsedVendorInfo);
+      }
       } catch (error) {
         console.error("Error parsing vendorInfo from localStorage:", error);
         // localStorage.removeItem('vendorInfo'); 

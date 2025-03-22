@@ -41,9 +41,9 @@ const SignIn = () => {
         method: 'sms', // We are now using only phone numbers
         actionType: 'signin', // Specify action type as 'signin'
       });
-      // console.log(response);
+      console.log(response);
 
-      if (!response.data.vendorExists) {
+      if (response?.data?.vendorExists === false) {
         alert('Vendor account not found. Please create an account first.');
         navigate('/signup'); // Redirect to sign-up page
         return;
@@ -51,6 +51,7 @@ const SignIn = () => {
 
       setStep(2); // Move to the OTP input step
     } catch (error) {
+      
       console.error('Error sending OTP:', error);
       alert('Failed to send OTP. Please try again.');
     } finally {
